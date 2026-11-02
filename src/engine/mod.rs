@@ -548,6 +548,10 @@ mod tests {
         assert_eq!(handle.lock().rt.transport_sample, 1_256);
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn inline_completion_advances_without_replaying_startup_block() {
         for (inline, seek_pending, advances) in [
@@ -570,6 +574,10 @@ mod tests {
         }
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn inline_loop_wrap_reanchors_capture_without_silencing_audio() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -612,6 +620,10 @@ mod tests {
         assert!(engine.inline_render.take_outcome().unwrap().stale);
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn recording_peaks_query_reports_real_take_bounds_and_channel_extrema() {
         let (mut engine, mut rx) = make_engine_with_client();
@@ -781,6 +793,10 @@ mod tests {
         assert!(!engine.rt_inline_enabled);
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn iodelay_calibration_applies_measured_total_and_blocks_during_recording() {
         let (mut engine, mut client_rx) = make_engine_with_client();
@@ -860,6 +876,10 @@ mod tests {
         assert_eq!(engine.recording.discard_remaining_frames, 0);
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn overlapping_added_clips_preserve_supplied_fades() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -918,6 +938,10 @@ mod tests {
         }
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn enabled_fades_are_clamped_to_minimum_on_add_and_set() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -1022,6 +1046,10 @@ mod tests {
         engine.publish_state_snapshot();
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[test]
     fn reset_meters_after_stop_decays_to_silence_over_one_second() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -1074,6 +1102,10 @@ mod tests {
         );
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn same_track_audio_connect_creates_internal_passthrough() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -1095,6 +1127,10 @@ mod tests {
         );
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn same_track_midi_connect_creates_internal_passthrough() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -1116,6 +1152,10 @@ mod tests {
         );
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn folder_inner_connections_restore_like_session_load() {
         use crate::connectable::ConnectableRef;
@@ -1469,6 +1509,10 @@ mod tests {
         assert_eq!(engine.dispatch.pending_requests.len(), 1);
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn offline_bounce_queue_starts_only_one_stem_at_a_time() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -1519,6 +1563,10 @@ mod tests {
         }
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn offline_bounce_queue_without_ready_worker_returns() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -3467,6 +3515,10 @@ mod tests {
         false
     }
 
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn moving_nested_folder_preserves_child_routes() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -4039,6 +4091,10 @@ mod tests {
     /// and drains at the cycle boundary with the full silence broadcast:
     /// transport stops, hw worker receives HWSetPlaying(false) AND
     /// HWZeroFillBuffers.
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn stop_is_queued_and_broadcasts_zero_fill_at_cycle_boundary() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -4085,6 +4141,10 @@ mod tests {
 
     /// Without an active transport (nothing can schedule a hw cycle), the
     /// queued stop drains immediately.
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Tokio runtime uses kqueue, which Miri does not support on FreeBSD"
+    )]
     #[tokio::test]
     async fn stop_without_active_transport_is_handled_immediately() {
         let (mut engine, _client_rx) = make_engine_with_client();
@@ -4094,7 +4154,7 @@ mod tests {
     }
 
     /// Device-gated (skips when unavailable; OSS_TEST_DEVICE, default
-    /// /dev/dsp5): open the real device, play a tone, stop (queued; the
+    /// /dev/dsp): open the real device, play a tone, stop (queued; the
     /// zero-fill broadcast silences the output), play again — audio must
     /// return (no trigger ioctls, no halt/resync stall).
     #[cfg(feature = "audio")]
@@ -4103,7 +4163,7 @@ mod tests {
         use crate::audio::clip::AudioClip;
         use crate::audio_codec::write_wav_f32;
 
-        let device = std::env::var("OSS_TEST_DEVICE").unwrap_or_else(|_| "/dev/dsp5".to_string());
+        let device = std::env::var("OSS_TEST_DEVICE").unwrap_or_else(|_| "/dev/dsp".to_string());
         let (engine_tx, engine_rx) = channel(16);
         let mut engine = Engine::new(engine_rx, engine_tx);
         let state = engine.state();

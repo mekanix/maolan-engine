@@ -744,7 +744,7 @@ impl Audio {
             // transport). Emit silence; the transport resyncs in the
             // dispatcher and the ring resyncs via the xrun jump machinery.
             self.stale_silence_once = false;
-            self.buffer.as_mut_slice().fill(0);
+            self.buffer.fill(0);
             return;
         }
         let num_channels = self.channels.len();
@@ -938,7 +938,7 @@ mod tests {
         )
     }
 
-    /// Full transport sequence on a real device (default /dev/dsp5, override
+    /// Full transport sequence on a real device (default /dev/dsp, override
     /// with OSS_TEST_DEVICE; skips when unavailable): play (cycles flow,
     /// capture and playback DMA run) -> stop (NEW INVARIANT: playback DMA
     /// keeps running — no trigger ioctls on stop — and the zero-fill writes
@@ -948,9 +948,13 @@ mod tests {
     /// stop again. Readable proxies (the hardware refuses a ring read-back
     /// mapping): DMA advancing during stop, and post-resume cycles at block
     /// rate with no underrun accumulation.
+    #[cfg_attr(
+        all(miri, target_os = "freebsd"),
+        ignore = "Syscall open is not supported by Miri"
+    )]
     #[test]
     fn play_stop_play_stop_keeps_dma_healthy() {
-        let device = std::env::var("OSS_TEST_DEVICE").unwrap_or_else(|_| "/dev/dsp5".to_string());
+        let device = std::env::var("OSS_TEST_DEVICE").unwrap_or_else(|_| "/dev/dsp".to_string());
         let Ok(mut driver) = HwDriver::new(&device, 48_000, 32) else {
             eprintln!("OSS test device {device} unavailable; skipping");
             return;

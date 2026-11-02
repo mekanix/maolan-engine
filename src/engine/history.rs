@@ -2034,15 +2034,15 @@ mod undo_consistency {
             }
         }
         #[cfg(all(unix, feature = "plugins"))]
-        if matches!(
+        let limited = matches!(
             action,
             Action::TrackLoadLv2Plugin { .. }
                 | Action::TrackUnloadLv2PluginInstance { .. }
                 | Action::TrackSetLv2ControlValue { .. }
-        ) {
-            return true;
-        }
-        false
+        );
+        #[cfg(not(all(unix, feature = "plugins")))]
+        let limited = false;
+        limited
     }
 
     #[test]
